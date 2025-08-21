@@ -1,114 +1,421 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import { useState } from "react";
+import Results from "../components/Results";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+interface FormData {
+  numPlayers: number;
+  targetTop: number;
+  numMatches: number| null;
+  gamesPerMatch: number;
+  pointsPerWin: number;
+  pointsPerTie: number;
+  pointsPerLoss: number;
+  tiebreakers: boolean [];
+  lastMatchIsDraw: boolean;
+  numUncomp: number;
+  probMatchTiesBetweenComp: number;
+  probMatchTiesBetweenUncomp: number;
+  probMatchTiesBetweenMismatched: number;
+  probGameWinBetweenMismatched: number;
+  probMatchWinBetweenMismatched: number| null;
+  monteCarloChosen: boolean;
+  // Add more variables here
+  // exampleVariable?: number;
+}
 
 export default function Home() {
+  const [formData, setFormData] = useState<FormData>({
+    numPlayers: 16,
+    numMatches: null, // 4,
+    gamesPerMatch: 3,
+    targetTop: 8, //8,
+    pointsPerWin: 3, //3,
+    pointsPerTie: 1, //1,
+    pointsPerLoss: 0, //0,
+    tiebreakers: [true,true,true], // ['omw','gw','ogw'],
+    lastMatchIsDraw: true, //true,
+    numUncomp: 0, //0,
+    probMatchTiesBetweenComp: .1, //.1,
+    probMatchTiesBetweenUncomp: .1, //.1,
+    probMatchTiesBetweenMismatched: .05, //.05,
+    probGameWinBetweenMismatched: .6, //.6,
+    probMatchWinBetweenMismatched: null, //0.7524
+    monteCarloChosen: false
+  });
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showSuperAdvanced, setShowSuperAdvanced] = useState(false);
+  const [results, setResults] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (key: keyof FormData, value: number) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+  };
+
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch("/api/calc", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error("API request failed");
+      const data = await res.json();
+      setResults(data.result);
+    } catch (err) {
+      console.error(err);
+      setResults("Error calculating results. Check console.");
+    }
+      finally {
+        setLoading(false);
+    }
+  };
+
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              pages/index.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-100 flex flex-col items-center justify-start py-12 px-4">
+      <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-8 font-sans">
+        MTG Tournament Calculator
+      </h1>
+
+      <div className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl p-8 space-y-6">
+        <form onSubmit={handleSubmit} className=" advanced-options w-full h-auto overflow-visible space-y-6">
+          {/* Basic Section */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4">
+              Basic Options
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-gray-50 rounded-xl shadow-inner">
+                <label className="block font-medium text-gray-700 mb-1">
+                  Number of Players
+                </label>
+                <input
+                  type="number"
+                  value={formData.numPlayers}
+                  onChange={(e) =>
+                    setFormData({...formData,
+                    numPlayers: Number(e.target.value),
+                    })
+                  }
+                  placeholder="e.g. 16"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                />
+              </div>
+              <div className="p-4 bg-gray-50 rounded-xl shadow-inner">
+                <label className="block font-medium text-gray-700 mb-1">Number of Matches</label>
+                <input
+                  type="number"
+                  value={formData.numMatches ?? ""}
+                  onChange={(e) =>
+                    setFormData({...formData,
+                    numMatches: e.target.value === "" ? null : Number(e.target.value),
+                    })
+                  }
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                  placeholder="If left empty is Ceiling(log_2(players))"
+                />
+              </div>
+              <div className="p-4 bg-gray-50 rounded-xl shadow-inner">
+                <label className="block font-medium text-gray-700 mb-1">Target Top N</label>
+                <input
+                  type="number"
+                  value={formData.targetTop}
+                  onChange={(e) =>
+                    setFormData({...formData,
+                    targetTop: Number(e.target.value),
+                    })
+                  }
+                  placeholder="e.g. 8"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                />
+              </div>
+              <div className="p-4 bg-gray-50 rounded-xl shadow-inner">
+                <label className="block font-medium text-gray-700 mb-1">Games per Match</label>
+                <input
+                  type="number"
+                  value={formData.gamesPerMatch}
+                  onChange={(e) =>
+                    setFormData({...formData,
+                    gamesPerMatch: Number(e.target.value),
+                    })
+                  }
+                  placeholder="e.g. 3"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Advanced Toggle */}
+          <button
+            type="button"
+            onClick={() => {setShowAdvanced(!showAdvanced); setShowSuperAdvanced(false);} }
+            className="text-blue-600 font-medium hover:underline transition"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            {showAdvanced ? "Hide Advanced Options" : "Show Advanced Options"}
+          </button>
+
+          {/* Advanced Section */}
+          <div
+            className={`transition-all duration-500 overflow-hidden ${
+            showAdvanced ? "max-h-[1000px] mt-4" : "max-h-0"
+            }`}
           >
-            Read our docs
-          </a>
+            <div className="advanced-options w-full h-auto overflow-visible p-4 rounded-xl shadow-inner bg-gray-50 space-y-4">
+              <h2 className="text-xl font-semibold text-gray-700 border-b pb-1 mb-2">
+                Advanced Options
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                
+                  <div className="col-span-2 p-3 bg-white rounded-lg shadow-sm">
+                  <label className="block font-medium text-gray-700 mb-1">Point Allocation</label>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-500">Win</label>
+                      <input
+                        type="number"
+                        value={formData.pointsPerWin ?? ""}
+                        onChange={(e) =>
+                          setFormData({ ...formData, pointsPerWin: Number(e.target.value) })
+                        }
+                        className="w-full px-1 py-1 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none transition sm:text-sm"
+                        placeholder="e.g. 3"
+                      />
+                    </div>
+                  <div>
+                    <label className="block text-xs text-gray-500">Loss</label>
+                    <input
+                      type="number"
+                      value={formData.pointsPerLoss ?? ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, pointsPerLoss: Number(e.target.value) })
+                      }
+                    className="w-full px-1 py-1 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none transition sm:text-sm"
+                    placeholder="e.g. 0"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500">Tie</label>
+                    <input
+                      type="number"
+                      value={formData.pointsPerTie ?? ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, pointsPerTie: Number(e.target.value) })
+                      }
+                      className="w-full px-1 py-1 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none transition sm:text-sm"
+                      placeholder="e.g. 1"
+                    />
+                  </div>
+                </div>
+              </div>
+                
+              <div className="p-3 bg-white rounded-lg shadow-sm">
+                <label className="block font-medium text-gray-700 mb-1">Tiebreakers</label>
+                {["Opponent Match Win%", "Game Win%", "Opponent Game Win%"].map(
+                  (label, index) => (
+                    <label key={index} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.tiebreakers[index]}
+                        onChange={(e) => {
+                          const newTiebreakers = [...formData.tiebreakers];
+                          newTiebreakers[index] = e.target.checked;
+                          setFormData({ ...formData, tiebreakers: newTiebreakers });
+                        }}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  )
+                )}
+              </div>
+                
+                
+              <div className="p-3 bg-white rounded-lg shadow-sm">
+                <label className="block font-medium text-gray-700 mb-1">Is the last match Normal?</label>
+                  <select
+                    id="allowLastRoundDraw"
+                    value={formData.lastMatchIsDraw ? "Draws" : "Normal"}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        lastMatchIsDraw: e.target.value === "Draws",
+                      })
+                    }
+                    className="w-full rounded-lg border p-2"
+                  >
+                    <option value="Draws"> Players draw to both make the top N</option>
+                    <option value="Normal"> Players play normally</option>
+                  </select>
+              </div>   
+      {/* super Advanced Toggle */}
+        <button
+          type="button"
+          onClick={() => setShowSuperAdvanced(!showSuperAdvanced)}
+          className="text-blue-600 font-medium hover:underline transition"
+        >
+          {showSuperAdvanced ? "Hide Super Advanced Options" : "Show Super Advanced Options"}
+        </button>
+            
+        {/* Super Advanced Section */}
+        <div
+            className={`col-span-2 transition-all duration-500 overflow-hidden ${
+            showSuperAdvanced ? "max-h-[1000px] mt-4" : "max-h-0"
+            }`}
+        >
+          <div className=" advanced-options w-full h-auto overflow-visible p-4 rounded-xl shadow-inner bg-gray-50 space-y-4">
+            <h2 className=" text-xl font-semibold text-gray-700 border-b pb-1 mb-2">
+              Super Advanced Options
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <div className="p-3 bg-white rounded-lg shadow-sm">
+                  <label className="block font-medium text-gray-700 mb-1"> Number of Uncompetitive decks in Tournament</label>
+                  <input
+                    type="number"
+                    value={formData.numUncomp ?? ""}
+                    onChange={(e) => handleChange("numUncomp", Number(e.target.value))}
+                    placeholder="0"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                  />
+              </div>
+
+            <div className="p-3 bg-white rounded-lg shadow-sm">
+                  <label className="block font-medium text-gray-700 mb-1"> Probability of Game Win Between Mismatched Decks</label>
+                  <input
+                    type="number"
+                    value={formData.probGameWinBetweenMismatched ?? ""}
+                    onChange={(e) => handleChange("probGameWinBetweenMismatched", Number(e.target.value))}
+                    placeholder="e.g. 0.6"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                  />
+            </div>
+
+
+            <div className=" col-span-2 p-3 bg-white rounded-lg shadow-sm">
+                  <label className="block font-medium text-gray-700 mb-1">Probability of Match Tie</label>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-500">Between Competitive Decks</label>
+                      <input
+                        type="number"
+                        value={formData.probMatchTiesBetweenComp ?? ""}
+                        onChange={(e) =>
+                          setFormData({ ...formData, probMatchTiesBetweenComp: Number(e.target.value) })
+                        }
+                        className="w-full px-1 py-1 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none transition sm:text-sm"
+                        placeholder="e.g. 0.1"
+                      />
+                    </div>
+                  <div>
+                    <label className="block text-xs text-gray-500">Between Uncompetitive Decks</label>
+                    <input
+                      type="number"
+                      value={formData.probMatchTiesBetweenUncomp ?? ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, probMatchTiesBetweenUncomp: Number(e.target.value) })
+                      }
+                      className="w-full px-1 py-1 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none transition sm:text-sm"
+                      placeholder="e.g. 0.1"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500">Between Mismatched Decks</label>
+                    <input
+                      type="number"
+                      value={formData.probMatchTiesBetweenMismatched ?? ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, probMatchTiesBetweenMismatched: Number(e.target.value) })
+                      }
+                      className="w-full px-1 py-1 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none transition sm:text-sm"
+                      placeholder="e.g. .05"
+                    />
+                  </div>
+                </div>
+              </div>
+
+
+            <div className="p-3 bg-white rounded-lg shadow-sm">
+              <label className="block font-medium text-gray-700 mb-1"> Probability of Match Win between Mismatched Decks</label>
+              <input
+                type="number"
+                value={formData.probMatchWinBetweenMismatched ?? ""}
+                onChange={(e) => handleChange("probMatchWinBetweenMismatched", Number(e.target.value))}
+                placeholder="If left empty, we estimate this value(defaults give .7524)"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+              />
+            </div>
+
+            <div className="p-3 bg-white rounded-lg shadow-sm">
+              <label className="block font-medium text-gray-700 mb-1">Use Monte-Carlo? (More accurate but slower)</label>
+                <input
+                  type="checkbox"
+                    checked={formData.monteCarloChosen}
+                      onChange={(e) => {
+                        setFormData({ ...formData, monteCarloChosen: e.target.checked });
+                        }}
+                />
+                
+              </div>
+                {/* TEMPLATE: Add more advanced inputs here */}
+                {/*
+                <div className="p-3 bg-white rounded-lg shadow-sm">
+                  <label className="block font-medium text-gray-700 mb-1">Example Advanced Variable</label>
+                  <input
+                    type="number"
+                    value={formData.exampleVariable || 0}
+                    onChange={(e) => handleChange("exampleVariable", Number(e.target.value))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                  />
+                </div>
+                */}
+              </div>
+            </div>
+          </div>
+         </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div> 
+      <button
+          type="submit"
+          className={`w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 flex items-center justify-center`}
+          disabled={loading} // disables button while calculating
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+          {loading ? (
+            <svg
+              className="animate-spin h-5 w-5 mr-2 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              ></path>
+            </svg>
+          ) : null}
+          {loading ? "Calculating..." : "Calculate"}
+        </button>
+        </form>
+        
+        {/* Results Section */}
+        {results && <Results results={results} />}
+      </div>
+
+      <footer className="mt-12 text-gray-500 text-sm">
+        &copy; 2025 MTG Calculator
       </footer>
     </div>
   );
