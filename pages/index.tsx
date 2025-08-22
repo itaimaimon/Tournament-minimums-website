@@ -160,14 +160,14 @@ export default function Home() {
           {/* Advanced Section */}
           <div
             className={`transition-all duration-500 overflow-hidden ${
-            showAdvanced ? "max-h-[1000px] mt-4" : "max-h-0"
+            showAdvanced ? "max-h-[2000px] mt-4" : "max-h-0"
             }`}
           >
-            <div className="advanced-options w-full h-auto overflow-visible p-4 rounded-xl shadow-inner bg-gray-50 space-y-4">
+            <div className="p-4 rounded-xl shadow-inner bg-gray-50 space-y-4">
               <h2 className="text-xl font-semibold text-gray-700 border-b pb-1 mb-2">
                 Advanced Options
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-4">
                 
                 
                   <div className="col-span-2 p-3 bg-white rounded-lg shadow-sm">
@@ -263,14 +263,14 @@ export default function Home() {
         {/* Super Advanced Section */}
         <div
             className={`col-span-2 transition-all duration-500 overflow-hidden ${
-            showSuperAdvanced ? "max-h-[1000px] mt-4" : "max-h-0"
+            showSuperAdvanced ? "max-h-[2000px] mt-4" : "max-h-0"
             }`}
         >
           <div className=" advanced-options w-full h-auto overflow-visible p-4 rounded-xl shadow-inner bg-gray-50 space-y-4">
             <h2 className=" text-xl font-semibold text-gray-700 border-b pb-1 mb-2">
               Super Advanced Options
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-4">
             
             <div className="p-3 bg-white rounded-lg shadow-sm">
                   <label className="block font-medium text-gray-700 mb-1"> Number of Uncompetitive decks in Tournament</label>
@@ -284,7 +284,7 @@ export default function Home() {
               </div>
 
             <div className="p-3 bg-white rounded-lg shadow-sm">
-                  <label className="block font-medium text-gray-700 mb-1"> Probability of Game Win Between Mismatched Decks</label>
+                  <label className="block font-medium text-gray-700 mb-1"> Probability of Game Win for Comp. against Uncomp.</label>
                   <input
                     type="number"
                     value={formData.probGameWinBetweenMismatched ?? ""}
@@ -300,7 +300,7 @@ export default function Home() {
 
                   <div className="grid grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs text-gray-500">Between Competitive Decks</label>
+                      <label className="block text-xs text-gray-500">Both Comp.</label>
                       <input
                         type="number"
                         value={formData.probMatchTiesBetweenComp ?? ""}
@@ -312,7 +312,7 @@ export default function Home() {
                       />
                     </div>
                   <div>
-                    <label className="block text-xs text-gray-500">Between Uncompetitive Decks</label>
+                    <label className="block text-xs text-gray-500">Both Uncomp.</label>
                     <input
                       type="number"
                       value={formData.probMatchTiesBetweenUncomp ?? ""}
@@ -324,7 +324,7 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500">Between Mismatched Decks</label>
+                    <label className="block text-xs text-gray-500">Mismatched</label>
                     <input
                       type="number"
                       value={formData.probMatchTiesBetweenMismatched ?? ""}
