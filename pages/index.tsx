@@ -12,12 +12,12 @@ interface FormData {
   tiebreakers: boolean [];
   lastMatchIsDraw: boolean;
   numUncomp: number;
-  probMatchTiesBetweenComp: number;
-  probMatchTiesBetweenUncomp: number;
-  probMatchTiesBetweenMismatched: number;
+  probLastGameTiesBetweenComp: number;
+  probLastGameTiesBetweenUncomp: number;
+  probLastGameTiesBetweenMismatched: number;
   probGameWinBetweenMismatched: number;
-  probMatchWinBetweenMismatched: number| null;
   monteCarloChosen: boolean;
+  monteCarloIterations: number;
   // Add more variables here
   // exampleVariable?: number;
 }
@@ -34,12 +34,13 @@ export default function Home() {
     tiebreakers: [true,true,true], // ['omw','gw','ogw'],
     lastMatchIsDraw: true, //true,
     numUncomp: 0, //0,
-    probMatchTiesBetweenComp: .1, //.1,
-    probMatchTiesBetweenUncomp: .1, //.1,
-    probMatchTiesBetweenMismatched: .05, //.05,
+    probLastGameTiesBetweenComp: .1, //.1,
+    probLastGameTiesBetweenUncomp: .1, //.1,
+    probLastGameTiesBetweenMismatched: .05, //.05,
     probGameWinBetweenMismatched: .6, //.6,
-    probMatchWinBetweenMismatched: null, //0.7524
-    monteCarloChosen: false
+    monteCarloChosen: false,
+    monteCarloIterations: 11, //0.10
+
   });
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showSuperAdvanced, setShowSuperAdvanced] = useState(false);
@@ -296,16 +297,16 @@ export default function Home() {
 
 
             <div className=" col-span-2 p-3 bg-white rounded-lg shadow-sm">
-                  <label className="block font-medium text-gray-700 mb-1">Probability of Match Tie</label>
+                  <label className="block font-medium text-gray-700 mb-1">Probability of Last Game Timing out to a Draw</label>
 
                   <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label className="block text-xs text-gray-500">Both Comp.</label>
                       <input
                         type="number"
-                        value={formData.probMatchTiesBetweenComp ?? ""}
+                        value={formData.probLastGameTiesBetweenComp ?? ""}
                         onChange={(e) =>
-                          setFormData({ ...formData, probMatchTiesBetweenComp: Number(e.target.value) })
+                          setFormData({ ...formData, probLastGameTiesBetweenComp: Number(e.target.value) })
                         }
                         className="w-full px-1 py-1 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none transition sm:text-sm"
                         placeholder="e.g. 0.1"
@@ -315,9 +316,9 @@ export default function Home() {
                     <label className="block text-xs text-gray-500">Both Uncomp.</label>
                     <input
                       type="number"
-                      value={formData.probMatchTiesBetweenUncomp ?? ""}
+                      value={formData.probLastGameTiesBetweenUncomp ?? ""}
                       onChange={(e) =>
-                        setFormData({ ...formData, probMatchTiesBetweenUncomp: Number(e.target.value) })
+                        setFormData({ ...formData, probLastGameTiesBetweenUncomp: Number(e.target.value) })
                       }
                       className="w-full px-1 py-1 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none transition sm:text-sm"
                       placeholder="e.g. 0.1"
@@ -327,9 +328,9 @@ export default function Home() {
                     <label className="block text-xs text-gray-500">Mismatched</label>
                     <input
                       type="number"
-                      value={formData.probMatchTiesBetweenMismatched ?? ""}
+                      value={formData.probLastGameTiesBetweenMismatched ?? ""}
                       onChange={(e) =>
-                        setFormData({ ...formData, probMatchTiesBetweenMismatched: Number(e.target.value) })
+                        setFormData({ ...formData, probLastGameTiesBetweenMismatched: Number(e.target.value) })
                       }
                       className="w-full px-1 py-1 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none transition sm:text-sm"
                       placeholder="e.g. .05"
@@ -337,18 +338,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-
-
-            <div className="p-3 bg-white rounded-lg shadow-sm">
-              <label className="block font-medium text-gray-700 mb-1"> Probability of Match Win between Mismatched Decks</label>
-              <input
-                type="number"
-                value={formData.probMatchWinBetweenMismatched ?? ""}
-                onChange={(e) => handleChange("probMatchWinBetweenMismatched", Number(e.target.value))}
-                placeholder="If left empty, we estimate this value(defaults give .7524)"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
-              />
-            </div>
 
             <div className="p-3 bg-white rounded-lg shadow-sm">
               <label className="block font-medium text-gray-700 mb-1">Use Monte-Carlo? (More accurate but slower)</label>
@@ -359,8 +348,22 @@ export default function Home() {
                         setFormData({ ...formData, monteCarloChosen: e.target.checked });
                         }}
                 />
-                
-              </div>
+            </div>
+
+            <div className="p-3 bg-white rounded-lg shadow-sm">
+              <label className="block font-medium text-gray-700 mb-1"> Number of Monte-Carlo Iterations (odd)</label>
+              <input
+                type="number"
+                value={formData.monteCarloIterations ?? ""}
+                onChange={(e) => handleChange("monteCarloIterations", Number(e.target.value))}
+                placeholder="If even we add 1 to make median pretty"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+              />
+            </div>
+
+
+
+
                 {/* TEMPLATE: Add more advanced inputs here */}
                 {/*
                 <div className="p-3 bg-white rounded-lg shadow-sm">

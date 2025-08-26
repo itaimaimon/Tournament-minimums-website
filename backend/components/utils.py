@@ -1,6 +1,7 @@
 from .score_class import ScoreData
 
 # Example constants or small helper functions
+#checked with inputs does as advertized
 def format_result(data: ScoreData, tiebreakers: list[bool]):
     points_needed=data.points
     OMW=data.OMW
@@ -12,9 +13,9 @@ def format_result(data: ScoreData, tiebreakers: list[bool]):
     OGW_chosen=tiebreakers[2]
 
     start_string= f"{points_needed} wins"
-    OMW_string= f"an opponenet match win rate of {OMW}"
+    OMW_string= f"an opponent match win rate of {OMW}"
     GW_string= f"a game win rate of {GW}"
-    OGW_string= f"an opponenet game win rate of {OGW}"
+    OGW_string= f"an opponent game win rate of {OGW}"
 
     full_string = start_string
     if OMW_chosen:
@@ -41,13 +42,16 @@ def format_result(data: ScoreData, tiebreakers: list[bool]):
     else:
         return full_string
     
+#tested
 def format_result_direct_calc(data: ScoreData, tiebreakers: list[bool], top: int):
-    out_string= "We estimate that you need at least" + format_result(data, tiebreakers) + f" to make top {top}" 
+    out_string= "We estimate that you need at least " + format_result(data, tiebreakers) + f" to make top {top}." 
     return out_string
 
-def format_result_monte_carlo(data_best_ninth_place: ScoreData, data_med_ninth_place:ScoreData, data_worst_eighth_place:ScoreData, data_med_eighth_place:ScoreData, tiebreakers: list[bool], top: int):
-    start_string= "The result of 1001 simulations is that"
+#tested
+def format_result_monte_carlo(data_best_ninth_place: ScoreData, data_med_ninth_place:ScoreData, data_worst_eighth_place:ScoreData, data_med_eighth_place:ScoreData, tiebreakers: list[bool], top: int, monte_carlo_iterations: int):
+    start_string= f"The result of {monte_carlo_iterations} simulations is that"
     second_string= f" the best score at place {top+1} was " + format_result(data_best_ninth_place,tiebreakers)
-    third_string = f". The median score at place {top+1} was " + format_result(data_med_ninth_place)
-    third_string = f". The worst score at place {top} was " + format_result(data_worst_eighth_place)
-    last_string = f". The median score at place {top} was " + format_result(data_med_eighth_place) + "."
+    third_string = f". The median score at place {top+1} was " + format_result(data_med_ninth_place,tiebreakers)
+    fourth_string = f". The worst score at place {top} was " + format_result(data_worst_eighth_place,tiebreakers)
+    last_string = f". The median score at place {top} was " + format_result(data_med_eighth_place,tiebreakers) + "."
+    return start_string+second_string+third_string+fourth_string+last_string

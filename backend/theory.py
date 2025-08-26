@@ -18,7 +18,8 @@ def calculate_minimum_results(data: InputData) -> str:
         return format_result_direct_calc(score,data.tiebreakers, data.targetTop) 
     elif data.monteCarloChosen:
         output_list = monte_carlo_simulation(data)
-        return format_result_monte_carlo(output_list[0],output_list[1],output_list[2],output_list[3], data.tiebreakers, data.targetTop)
+        print(output_list)
+        return format_result_monte_carlo(output_list[0],output_list[1],output_list[2],output_list[3], data.tiebreakers, data.targetTop, data.monteCarloIterations)
     else:
         output = direct_calculation(data)
         return format_result_direct_calc(output, data.tiebreakers, data.targetTop)

@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from pydantic import BaseModel, conint, Field
+from pydantic import BaseModel, conint, Field, AfterValidator, ValidationError
 from typing import List, Optional, Annotated
 from theory import calculate_minimum_results
 from components.input_class import InputData
-
+from annotated_types import Len
 
 # --- FastAPI app ---
 app = FastAPI()
@@ -21,12 +21,12 @@ class FormData(BaseModel):
     tiebreakers: List[bool]
     lastMatchIsDraw: bool
     numUncomp: Annotated[int,Field(ge=0, default = 0)]
-    probMatchTiesBetweenComp: Annotated[float,Field(ge=0, le=1, default = .1)]
-    probMatchTiesBetweenUncomp: Annotated[float,Field(ge=0, le=1, default = .1)]
-    probMatchTiesBetweenMismatched: Annotated[float,Field(ge=0, le=1, default = .1)]
+    probLastGameTiesBetweenComp: Annotated[float,Field(ge=0, le=1, default = .1)]
+    probLastGameTiesBetweenUncomp: Annotated[float,Field(ge=0, le=1, default = .1)]
+    probLastGameTiesBetweenMismatched: Annotated[float,Field(ge=0, le=1, default = .1)]
     probGameWinBetweenMismatched: Annotated[float,Field(ge=0, le=1, default = .6)]
-    probMatchWinBetweenMismatched: Optional[Annotated[float,Field(ge=0, le=1)]]= None
     monteCarloChosen: bool
+    monteCarloIterations: Annotated[int,Field(gt=0, le=2000,default=10)]
 
 
 # --- API route ---
@@ -48,12 +48,12 @@ def calculate_route(data: FormData):
         tiebreakers =data_dict["tiebreakers"],
         lastMatchIsDraw =data_dict["lastMatchIsDraw"],
         numUncomp =data_dict["numUncomp"],
-        probMatchTiesBetweenComp =data_dict["probMatchTiesBetweenComp"],
-        probMatchTiesBetweenUncomp =data_dict["probMatchTiesBetweenUncomp"],
-        probMatchTiesBetweenMismatched =data_dict["probMatchTiesBetweenMismatched"],
+        probLastGameTiesBetweenComp =data_dict["probLastGameTiesBetweenComp"],
+        probLastGameTiesBetweenUncomp =data_dict["probLastGameTiesBetweenUncomp"],
+        probLastGameTiesBetweenMismatched =data_dict["probLastGameTiesBetweenMismatched"],
         probGameWinBetweenMismatched =data_dict["probGameWinBetweenMismatched"],
-        probMatchWinBetweenMismatched = data_dict.get("probMatchWinBetweenMismatched"),
         monteCarloChosen =  data_dict["monteCarloChosen"],
+        monteCarloIterations = data_dict.get("monteCarloIterations"),
     )
     
     # Call your calculation function
