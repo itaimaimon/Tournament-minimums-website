@@ -38,7 +38,7 @@ export default function Home() {
     probLastGameTiesBetweenUncomp: .1, //.1,
     probLastGameTiesBetweenMismatched: .05, //.05,
     probGameWinBetweenMismatched: .6, //.6,
-    monteCarloChosen: false,
+    monteCarloChosen: true,
     monteCarloIterations: 11, //0.10
 
   });
@@ -340,7 +340,7 @@ export default function Home() {
               </div>
 
             <div className="p-3 bg-white rounded-lg shadow-sm">
-              <label className="block font-medium text-gray-700 mb-1">Use Monte-Carlo? (More accurate but slower)</label>
+              <label className="block font-medium text-gray-700 mb-1">Use Monte-Carlo? (More accurate but a little slower)</label>
                 <input
                   type="checkbox"
                     checked={formData.monteCarloChosen}

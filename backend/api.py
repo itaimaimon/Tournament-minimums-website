@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel, conint, Field, AfterValidator, ValidationError
 from typing import List, Optional, Annotated
-from theory import calculate_minimum_results
-from components.input_class import InputData
+from backend.theory import calculate_minimum_results
+from backend.components.input_class import InputData
 from annotated_types import Len
 
 # --- FastAPI app ---

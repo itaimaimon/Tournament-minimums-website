@@ -1,6 +1,6 @@
-from MTG-CALCULATOR-2.backend import InputData 
-from .score_class import ScoreData
-from .player_class import PlayerData, AllPlayerData
+from backend.components.input_class import InputData 
+from backend.components.score_class import ScoreData
+from backend.components.player_class import PlayerData, AllPlayerData
 import random 
 import math
 
@@ -71,7 +71,7 @@ def simulate_bye(bye: int,players_dict):
 def set_pairings(players_dict:dict, data : InputData ):
     players= list(players_dict.values())
     
-    players.sort(key= lambda p: -1*p.get_points(data))
+    players.sort(key= lambda p: p.get_points(data),reverse=True)
     
     keys=[]
     for i in players:
@@ -108,24 +108,22 @@ def order(data: list[ScoreData], tiebreakers):
     if( tiebreakers[0]):
         if tiebreakers[1]:
             if tiebreakers[2]:
-                data.sort(key= lambda p: (p.points,p.OMW,p.GW,p.OGW))
+                data.sort(key= lambda p: (p.points,p.OMW,p.GW,p.OGW), reverse=True)
             else:
-                data.sort(key= lambda p: (p.points,p.OMW,p.GW))
+                data.sort(key= lambda p: (p.points,p.OMW,p.GW), reverse=True)
         elif tiebreakers[2]:
-            data.sort(key= lambda p: (p.points,p.OMW,p.GW))
+            data.sort(key= lambda p: (p.points,p.OMW,p.OGW), reverse=True)
         else:
-            data.sort(key= lambda p: (p.points,p.OMW))
+            data.sort(key= lambda p: (p.points,p.OMW), reverse=True)
     elif tiebreakers[1]:
         if tiebreakers[2]:
-            data.sort(key= lambda p: (p.points,p.OGW,p.GW))
+            data.sort(key= lambda p: (p.points,p.GW,p.OGW), reverse=True)
         else:
-            data.sort(key= lambda p: (p.points,p.OGW))
+            data.sort(key= lambda p: (p.points,p.GW), reverse=True)
     elif tiebreakers[2]:
-        data.sort(key= lambda p: (p.points,p.GW))
+        data.sort(key= lambda p: (p.points,p.OGW), reverse=True)
     else:
-        data.sort(key= lambda p: p.points)
-
-
+        data.sort(key= lambda p: p.points, reverse=True)
     return data
 
 def process( top_9: list, top_8:list , tiebreakers: list[bool],monte_carlo_iterations):
@@ -136,10 +134,4 @@ def process( top_9: list, top_8:list , tiebreakers: list[bool],monte_carlo_itera
     top_9_ordered= order(top_9, tiebreakers)
     top_8_ordered = order( top_8, tiebreakers)
     
-    return (top_9_ordered[monte_carlo_iterations-1],top_9_ordered[int((monte_carlo_iterations-1)/2)],top_8_ordered[0],top_8_ordered[int((monte_carlo_iterations-1)/2)])
-        
-data = InputData(numPlayers=11,numMatches=3, gamesPerMatch=3, targetTop=6, pointsPerWin=3, pointsPerTie=1, pointsPerLoss=0, tiebreakers=[True,True,True], lastMatchIsDraw=True, 
-        numUncomp=0,probLastGameTiesBetweenComp=.02, probLastGameTiesBetweenUncomp=.02,probLastGameTiesBetweenMismatched=.02,probGameWinBetweenMismatched=.02,
-        monteCarloChosen=True,monteCarloIterations=11)
-
-monte_carlo_simulation(data)
+    return (top_9_ordered[0],top_9_ordered[int((monte_carlo_iterations-1)/2)],top_8_ordered[monte_carlo_iterations-1],top_8_ordered[int((monte_carlo_iterations-1)/2)])

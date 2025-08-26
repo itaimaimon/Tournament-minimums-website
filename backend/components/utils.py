@@ -1,4 +1,4 @@
-from .score_class import ScoreData
+from backend.components.score_class import ScoreData
 
 # Example constants or small helper functions
 #checked with inputs does as advertized
@@ -12,7 +12,7 @@ def format_result(data: ScoreData, tiebreakers: list[bool]):
     GW_chosen=tiebreakers[1]
     OGW_chosen=tiebreakers[2]
 
-    start_string= f"{points_needed} wins"
+    start_string= f"{points_needed} points"
     OMW_string= f"an opponent match win rate of {OMW}"
     GW_string= f"a game win rate of {GW}"
     OGW_string= f"an opponent game win rate of {OGW}"

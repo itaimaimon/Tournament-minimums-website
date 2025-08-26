@@ -1,8 +1,9 @@
-from components.input_class import InputData
-from components.monte_carlo import monte_carlo_simulation
-from components.direct_calc import direct_calculation
-from components.utils import format_result_direct_calc, format_result_monte_carlo
-from components.score_class import ScoreData
+from backend.components.input_class import InputData
+from backend.components.input_class import InputData
+from backend.components.monte_carlo import monte_carlo_simulation
+from backend.components.direct_calc import direct_calculation
+from backend.components.utils import format_result_direct_calc, format_result_monte_carlo
+from backend.components.score_class import ScoreData
 
 def calculate_minimum_results(data: InputData) -> str:
     # Choose one calculation method

@@ -52,9 +52,9 @@ class InputData:
         #always assumes player one is advantaged if mismatched
         #outcomes of form ('won'/'lost'/'tied',games_won, games_lost,games_tied,total_games)
         if monteCarloChosen:
-            self.function_of_match_outcomes_comp= match_outcome_function(self.probGameWinBetweenMatchedDecks,self.numMatches,self.probLastGameTiesBetweenComp)
-            self.function_of_match_outcomes_uncomp = match_outcome_function(self.probGameWinBetweenMatchedDecks,self.numMatches,self.probLastGameTiesBetweenUncomp)
-            self.function_of_match_outcomes_mismatched = match_outcome_function(self.probGameWinBetweenMismatched,self.numMatches,self.probLastGameTiesBetweenMismatched)
+            self.function_of_match_outcomes_comp= match_outcome_function(self.probGameWinBetweenMatchedDecks,self.gamesPerMatch,self.probLastGameTiesBetweenComp)
+            self.function_of_match_outcomes_uncomp = match_outcome_function(self.probGameWinBetweenMatchedDecks,self.gamesPerMatch,self.probLastGameTiesBetweenUncomp)
+            self.function_of_match_outcomes_mismatched = match_outcome_function(self.probGameWinBetweenMismatched,self.gamesPerMatch,self.probLastGameTiesBetweenMismatched)
 
 
 
@@ -70,46 +70,46 @@ def event_probs(i,j,p_i,p_j):
 def get_to_step_n(i,j,p_i,p_j):
     return math.comb(int(i+j),int(max(i,j)))*p_i**i*p_j**j
 
-def generate_list_of_cutoffs(game_win_prob_player_one, numMatches, ProbLastGameTies):
-    if( numMatches%2==1):
+def generate_list_of_cutoffs(game_win_prob_player_one, games_per_match, ProbLastGameTies):
+    if( games_per_match%2==1):
         #deal with last game tie problems
-        prob_match_tie= event_probs(math.floor(numMatches/2),math.floor(numMatches/2),game_win_prob_player_one,1-game_win_prob_player_one)*(ProbLastGameTies)
-        prob_match_win_by_one= event_probs(math.ceil(numMatches/2),math.floor(numMatches/2),game_win_prob_player_one,1-game_win_prob_player_one)*(1-ProbLastGameTies)
-        prob_match_lose_by_one= event_probs(math.floor(numMatches/2),math.ceil(numMatches/2),game_win_prob_player_one,1-game_win_prob_player_one)*(1-ProbLastGameTies)
+        prob_match_tie= event_probs(math.floor(games_per_match/2),math.floor(games_per_match/2),game_win_prob_player_one,1-game_win_prob_player_one)*(ProbLastGameTies)
+        prob_match_win_by_one= event_probs(math.ceil(games_per_match/2),math.floor(games_per_match/2),game_win_prob_player_one,1-game_win_prob_player_one)*(1-ProbLastGameTies)
+        prob_match_lose_by_one= event_probs(math.floor(games_per_match/2),math.ceil(games_per_match/2),game_win_prob_player_one,1-game_win_prob_player_one)*(1-ProbLastGameTies)
     
         list_of_cutoffs=[0,prob_match_tie,prob_match_win_by_one+prob_match_tie,prob_match_lose_by_one+prob_match_win_by_one+prob_match_tie]
         curr_prob=prob_match_lose_by_one+prob_match_win_by_one+prob_match_tie
-        for i in range(math.floor(numMatches/2)):
-            curr_prob+= event_probs(math.ceil(numMatches/2),i,game_win_prob_player_one,1-game_win_prob_player_one)
+        for i in range(math.floor(games_per_match/2)):
+            curr_prob+= event_probs(math.ceil(games_per_match/2),i,game_win_prob_player_one,1-game_win_prob_player_one)
             list_of_cutoffs.append(curr_prob)
-        for i in range(math.floor(numMatches/2)):
-            curr_prob+= event_probs(i,math.ceil(numMatches/2),game_win_prob_player_one,1-game_win_prob_player_one)
+        for i in range(math.floor(games_per_match/2)):
+            curr_prob+= event_probs(i,math.ceil(games_per_match/2),game_win_prob_player_one,1-game_win_prob_player_one)
             list_of_cutoffs.append(curr_prob)
     else:
-        prob_match_tie= event_probs(numMatches/2,numMatches/2,game_win_prob_player_one,1-game_win_prob_player_one)*(1-ProbLastGameTies)
-        prob_match_win_by_two=event_probs(numMatches/2+1,numMatches/2-1,game_win_prob_player_one,1-game_win_prob_player_one)*(1-ProbLastGameTies)
-        prob_match_lose_by_two=event_probs(numMatches/2-1,numMatches/2+1,game_win_prob_player_one,1-game_win_prob_player_one)*(1-ProbLastGameTies)
+        prob_match_tie= event_probs(games_per_match/2,games_per_match/2,game_win_prob_player_one,1-game_win_prob_player_one)*(1-ProbLastGameTies)
+        prob_match_win_by_two=event_probs(games_per_match/2+1,games_per_match/2-1,game_win_prob_player_one,1-game_win_prob_player_one)*(1-ProbLastGameTies)
+        prob_match_lose_by_two=event_probs(games_per_match/2-1,games_per_match/2+1,game_win_prob_player_one,1-game_win_prob_player_one)*(1-ProbLastGameTies)
         
-        prob_match_win_by_one=get_to_step_n(numMatches/2,numMatches/2-1,game_win_prob_player_one,1-game_win_prob_player_one)*(ProbLastGameTies)
-        prob_match_lose_by_one= get_to_step_n(numMatches/2-1,numMatches/2,game_win_prob_player_one,1-game_win_prob_player_one)*(ProbLastGameTies)
+        prob_match_win_by_one=get_to_step_n(games_per_match/2,games_per_match/2-1,game_win_prob_player_one,1-game_win_prob_player_one)*(ProbLastGameTies)
+        prob_match_lose_by_one= get_to_step_n(games_per_match/2-1,games_per_match/2,game_win_prob_player_one,1-game_win_prob_player_one)*(ProbLastGameTies)
     
         list_of_cutoffs=[0,prob_match_tie,prob_match_win_by_one+prob_match_tie,prob_match_lose_by_one+prob_match_win_by_one+prob_match_tie,\
                              prob_match_win_by_two +prob_match_lose_by_one+prob_match_win_by_one+prob_match_tie,prob_match_lose_by_two+prob_match_win_by_two +prob_match_lose_by_one+prob_match_win_by_one+prob_match_tie]
         
         curr_prob=prob_match_lose_by_two+prob_match_win_by_two +prob_match_lose_by_one+prob_match_win_by_one+prob_match_tie
-        for i in range(math.floor(numMatches/2)-1):
-            curr_prob+= event_probs(numMatches/2+1,i,game_win_prob_player_one,1-game_win_prob_player_one)
+        for i in range(math.floor(games_per_match/2)-1):
+            curr_prob+= event_probs(games_per_match/2+1,i,game_win_prob_player_one,1-game_win_prob_player_one)
             list_of_cutoffs.append(curr_prob)
-        for i in range(math.floor(numMatches/2)-1):
-            curr_prob+= event_probs(i,numMatches/2+1,game_win_prob_player_one,1-game_win_prob_player_one)
+        for i in range(math.floor(games_per_match/2)-1):
+            curr_prob+= event_probs(i,games_per_match/2+1,game_win_prob_player_one,1-game_win_prob_player_one)
             list_of_cutoffs.append(curr_prob)
     return list_of_cutoffs
 
-def match_outcome_function(game_win_prob_player_one, numMatches, ProbLastGameTies):
+def match_outcome_function(game_win_prob_player_one, games_per_match, ProbLastGameTies):
 
-    list_of_cutoffs=generate_list_of_cutoffs(game_win_prob_player_one,numMatches,ProbLastGameTies)
+    list_of_cutoffs=generate_list_of_cutoffs(game_win_prob_player_one,games_per_match,ProbLastGameTies)
     #odd case
-    if( numMatches%2==1):
+    if( games_per_match%2==1):
         #define output function
         def output_function(random_number):
 
@@ -129,8 +129,8 @@ def match_outcome_function(game_win_prob_player_one, numMatches, ProbLastGameTie
                 player_two_match_outcome= 'tied'
 
                 games_tied= 1
-                games_won_by_one = math.floor(numMatches/2)
-                games_won_by_two = math.floor(numMatches/2)
+                games_won_by_one = math.floor(games_per_match/2)
+                games_won_by_two = math.floor(games_per_match/2)
                 total_games=games_won_by_one+games_won_by_two+games_tied
   
             elif(random_number<=list_of_cutoffs[2]):
@@ -139,8 +139,8 @@ def match_outcome_function(game_win_prob_player_one, numMatches, ProbLastGameTie
                 player_two_match_outcome= 'lost'
 
                 games_tied= 0
-                games_won_by_one=math.ceil(numMatches/2)
-                games_won_by_two=math.floor(numMatches/2)
+                games_won_by_one=math.ceil(games_per_match/2)
+                games_won_by_two=math.floor(games_per_match/2)
                 total_games=games_won_by_one+games_won_by_two+games_tied
 
             elif(random_number<=list_of_cutoffs[3]):
@@ -149,26 +149,26 @@ def match_outcome_function(game_win_prob_player_one, numMatches, ProbLastGameTie
                 player_two_match_outcome= 'won'
 
                 games_tied= 0
-                games_won_by_one=math.floor(numMatches/2)
-                games_won_by_two=math.ceil(numMatches/2)
+                games_won_by_one=math.floor(games_per_match/2)
+                games_won_by_two=math.ceil(games_per_match/2)
                 total_games=games_won_by_one+games_won_by_two+games_tied
 
             else:
                 #rest done by loop
                 for i in range(3,len(list_of_cutoffs)-1):
                     if (random_number<= list_of_cutoffs[i+1] and random_number>list_of_cutoffs[i]):
-                        if i<=numMatches/2+2: #math.floor(numMatches/2)+2
+                        if i<=games_per_match/2+2: #math.floor(games_per_match/2)+2
                             player_one_match_outcome= 'won'
                             player_two_match_outcome= 'lost'
-                            games_won_by_one= math.ceil(numMatches/2)
+                            games_won_by_one= math.ceil(games_per_match/2)
                             games_won_by_two=i-3
                             games_tied=0
                             total_games=games_won_by_one+games_won_by_two+games_tied
                         else:
                             player_one_match_outcome= 'lost'
                             player_two_match_outcome= 'won'
-                            games_won_by_one= i-math.ceil(numMatches/2)+2
-                            games_won_by_two= math.ceil(numMatches/2)
+                            games_won_by_one= i-math.ceil(games_per_match/2)+2
+                            games_won_by_two= math.ceil(games_per_match/2)
                             games_tied=0
                             total_games=games_won_by_one+ games_won_by_two+games_tied
                         break
@@ -198,8 +198,8 @@ def match_outcome_function(game_win_prob_player_one, numMatches, ProbLastGameTie
                 #tied done by hand
                 players_tied=True
                 games_tied= 0
-                games_won_by_one = numMatches/2
-                games_won_by_two = numMatches/2
+                games_won_by_one = games_per_match/2
+                games_won_by_two = games_per_match/2
                 total_games=games_won_by_one+games_won_by_two+games_tied
 
                 player_one_match_outcome= 'tied'
@@ -211,8 +211,8 @@ def match_outcome_function(game_win_prob_player_one, numMatches, ProbLastGameTie
                 player_two_match_outcome= 'lost'
 
                 games_tied= 1
-                games_won_by_one=numMatches/2
-                games_won_by_two=numMatches/2-1
+                games_won_by_one=games_per_match/2
+                games_won_by_two=games_per_match/2-1
                 total_games=games_won_by_one+games_won_by_two+games_tied
 
             elif(random_number<=list_of_cutoffs[3]):
@@ -221,8 +221,8 @@ def match_outcome_function(game_win_prob_player_one, numMatches, ProbLastGameTie
                 player_two_match_outcome= 'won'
 
                 games_tied= 1
-                games_won_by_one=numMatches/2-1
-                games_won_by_two=numMatches/2
+                games_won_by_one=games_per_match/2-1
+                games_won_by_two=games_per_match/2
                 total_games=games_won_by_one+games_won_by_two+games_tied
 
             elif(random_number<=list_of_cutoffs[4]):
@@ -231,8 +231,8 @@ def match_outcome_function(game_win_prob_player_one, numMatches, ProbLastGameTie
                 player_two_match_outcome= 'lost'
 
                 games_tied= 0
-                games_won_by_one=numMatches/2+1
-                games_won_by_two=numMatches/2-1
+                games_won_by_one=games_per_match/2+1
+                games_won_by_two=games_per_match/2-1
                 total_games=games_won_by_one+games_won_by_two+games_tied                
                 
             elif(random_number<=list_of_cutoffs[5]):
@@ -241,8 +241,8 @@ def match_outcome_function(game_win_prob_player_one, numMatches, ProbLastGameTie
                 player_two_match_outcome= 'won'
 
                 games_tied= 0
-                games_won_by_one=numMatches/2-1
-                games_won_by_two=numMatches/2+1
+                games_won_by_one=games_per_match/2-1
+                games_won_by_two=games_per_match/2+1
                 total_games=games_won_by_one+games_won_by_two+games_tied    
 
 
@@ -250,18 +250,18 @@ def match_outcome_function(game_win_prob_player_one, numMatches, ProbLastGameTie
 
                 for i in range(5,len(list_of_cutoffs)-1):
                     if (random_number<=list_of_cutoffs[i+1] and random_number>list_of_cutoffs[i]):
-                        if i<=numMatches/2+3: 
+                        if i<=games_per_match/2+3: 
                             player_one_match_outcome= 'won'
                             player_two_match_outcome= 'lost'
-                            games_won_by_one= numMatches/2+1
+                            games_won_by_one= games_per_match/2+1
                             games_won_by_two=i-5
                             games_tied=0
                             total_games=games_won_by_one+games_won_by_two+games_tied
                         else:
                             player_one_match_outcome= 'lost'
                             player_two_match_outcome= 'won'
-                            games_won_by_one= i-(numMatches/2+4)
-                            games_won_by_two= numMatches/2+1
+                            games_won_by_one= i-(games_per_match/2+4)
+                            games_won_by_two= games_per_match/2+1
                             games_tied=0
                             total_games=games_won_by_one+ games_won_by_two+games_tied
                         break

@@ -1,5 +1,5 @@
-from score_class import ScoreData
-from input_class import InputData
+from backend.components.score_class import ScoreData
+from backend.components.input_class import InputData
 import random
 
 
