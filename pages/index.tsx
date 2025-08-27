@@ -16,7 +16,7 @@ interface FormData {
   probLastGameTiesBetweenUncomp: number;
   probLastGameTiesBetweenMismatched: number;
   probGameWinBetweenMismatched: number;
-  monteCarloChosen: boolean;
+  minDrawProb: number;
   monteCarloIterations: number;
   // Add more variables here
   // exampleVariable?: number;
@@ -38,7 +38,7 @@ export default function Home() {
     probLastGameTiesBetweenUncomp: .1, //.1,
     probLastGameTiesBetweenMismatched: .05, //.05,
     probGameWinBetweenMismatched: .6, //.6,
-    monteCarloChosen: true,
+    minDrawProb: 0.9, //0.9,
     monteCarloIterations: 11, //0.10
 
   });
@@ -234,24 +234,17 @@ export default function Home() {
                 )}
               </div>
                 
+            <div className="p-3 bg-white rounded-lg shadow-sm">
+              <label className="block font-medium text-gray-700 mb-1"> Number of Monte-Carlo Iterations (odd)</label>
+              <input
+                type="number"
+                value={formData.monteCarloIterations ?? ""}
+                onChange={(e) => handleChange("monteCarloIterations", Number(e.target.value))}
+                placeholder="If even we add 1 to make median pretty"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+              />
+            </div>
                 
-              <div className="p-3 bg-white rounded-lg shadow-sm">
-                <label className="block font-medium text-gray-700 mb-1">Is the last match Normal?</label>
-                  <select
-                    id="allowLastRoundDraw"
-                    value={formData.lastMatchIsDraw ? "Draws" : "Normal"}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        lastMatchIsDraw: e.target.value === "Draws",
-                      })
-                    }
-                    className="w-full rounded-lg border p-2"
-                  >
-                    <option value="Draws"> Players draw to both make the top N</option>
-                    <option value="Normal"> Players play normally</option>
-                  </select>
-              </div>   
       {/* super Advanced Toggle */}
         <button
           type="button"
@@ -339,30 +332,34 @@ export default function Home() {
                 </div>
               </div>
 
+              <div className="p-3 bg-white rounded-lg shadow-sm">
+                <label className="block font-medium text-gray-700 mb-1">Is the last match Normal?(only works if monte-carlo is not chosen)</label>
+                  <select
+                    id="allowLastRoundDraw"
+                    value={formData.lastMatchIsDraw ? "Draws" : "Normal"}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        lastMatchIsDraw: e.target.value === "Draws",
+                      })
+                    }
+                    className="w-full rounded-lg border p-2"
+                  >
+                    <option value="Draws"> Players draw to both make the top N</option>
+                    <option value="Normal"> Players play normally</option>
+                  </select>
+              </div>   
+
             <div className="p-3 bg-white rounded-lg shadow-sm">
-              <label className="block font-medium text-gray-700 mb-1">Use Monte-Carlo? (More accurate but a little slower)</label>
+              <label className="block font-medium text-gray-700 mb-1"> Minimum Probability needed for both players to draw last Match</label>
                 <input
-                  type="checkbox"
-                    checked={formData.monteCarloChosen}
-                      onChange={(e) => {
-                        setFormData({ ...formData, monteCarloChosen: e.target.checked });
-                        }}
+                  type="number"
+                  value={formData.minDrawProb ?? ""}
+                  onChange={(e) => handleChange("minDrawProb", Number(e.target.value))}
+                  placeholder="e.g. 0.9"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
                 />
             </div>
-
-            <div className="p-3 bg-white rounded-lg shadow-sm">
-              <label className="block font-medium text-gray-700 mb-1"> Number of Monte-Carlo Iterations (odd)</label>
-              <input
-                type="number"
-                value={formData.monteCarloIterations ?? ""}
-                onChange={(e) => handleChange("monteCarloIterations", Number(e.target.value))}
-                placeholder="If even we add 1 to make median pretty"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
-              />
-            </div>
-
-
-
 
                 {/* TEMPLATE: Add more advanced inputs here */}
                 {/*

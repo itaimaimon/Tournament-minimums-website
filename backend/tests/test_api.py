@@ -14,7 +14,7 @@ def test_calculate_endpoint_valid(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.7,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -37,7 +37,7 @@ def test_calculate_endpoint_missing_num_matches(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.7,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -60,7 +60,7 @@ def test_calculate_endpoint_invalid_num_players(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.7,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -83,7 +83,7 @@ def test_calculate_endpoint_invalid_num_Matches(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.7,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -106,7 +106,7 @@ def test_calculate_endpoint_invalid_games_per_match(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.7,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -129,7 +129,7 @@ def test_calculate_endpoint_invalid_target_top(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.7,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -152,7 +152,7 @@ def test_calculate_endpoint_invalid_points(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.7,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -174,7 +174,7 @@ def test_calculate_endpoint_invalid_tiebreakers(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.7,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -196,7 +196,7 @@ def test_calculate_endpoint_invalid_lastMatch(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.7,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -219,7 +219,7 @@ def test_calculate_endpoint_invalid_num_uncomp(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.7,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -241,7 +241,7 @@ def test_calculate_endpoint_invalid_probs(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":1.1,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -264,7 +264,7 @@ def test_calculate_endpoint_invalid_probs_2(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":1.5,
         "probGameWinBetweenMismatched":.9,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -286,7 +286,7 @@ def test_calculate_endpoint_invalid_probs_3(client):
         "probLastGameTiesBetweenUncomp":1.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.9,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -309,13 +309,13 @@ def test_calculate_endpoint_invalid_probs_3(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.9,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
     assert response.status_code in (400, 422, 500) 
 
-def test_calculate_endpoint_invalid_monte_carlo_chosen(client):
+def test_calculate_endpoint_invalid_minProb_Draw(client):
     payload = {
         "numPlayers": 8,
         "numMatches": 3,
@@ -331,7 +331,7 @@ def test_calculate_endpoint_invalid_monte_carlo_chosen(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.7,
-        "monteCarloChosen":'d',
+        "minDrawProb":1.2,
         "monteCarloIterations":2,
     }
     response = client.post("/calculate", json=payload)
@@ -354,7 +354,7 @@ def test_calculate_endpoint_invalid_monte_carlo_iteration(client):
         "probLastGameTiesBetweenUncomp":.3,
         "probLastGameTiesBetweenMismatched":.5,
         "probGameWinBetweenMismatched":.7,
-        "monteCarloChosen":True,
+        "minDrawProb":.9,
         "monteCarloIterations":.4,
     }
     response = client.post("/calculate", json=payload)

@@ -6,7 +6,7 @@ from backend.components.score_class import ScoreData
 def test_playerdata_get_points_win_loss_tie():
     data = InputData(numPlayers=8,numMatches=3, gamesPerMatch=3, targetTop=6, pointsPerWin=3, pointsPerTie=1, pointsPerLoss=0, tiebreakers=[True,True,True], lastMatchIsDraw=True, 
         numUncomp=1,probLastGameTiesBetweenComp=.02, probLastGameTiesBetweenUncomp=.02,probLastGameTiesBetweenMismatched=.02,probGameWinBetweenMismatched=.02,
-        monteCarloChosen=False,monteCarloIterations=10)
+        minDrawProb=.9,monteCarloIterations=10)
     player = PlayerData(
         key=0, Comp=True,
         MatchesWon=2, MatchesLost=1, MatchesTied=1,
@@ -18,7 +18,7 @@ def test_playerdata_get_points_win_loss_tie():
 def test_allplayerdata_initialization_creates_players(monkeypatch):
     data = InputData(numPlayers=5,numMatches=3, gamesPerMatch=3, targetTop=6, pointsPerWin=3, pointsPerTie=1, pointsPerLoss=0, tiebreakers=[True,True,True], lastMatchIsDraw=True, 
         numUncomp=2,probLastGameTiesBetweenComp=.02, probLastGameTiesBetweenUncomp=.02,probLastGameTiesBetweenMismatched=.02,probGameWinBetweenMismatched=.02,
-        monteCarloChosen=False,monteCarloIterations=10)
+        minDrawProb=.9,monteCarloIterations=10)
     # Patch random.sample to make test deterministic
     monkeypatch.setattr("backend.components.player_class.random.sample", lambda x, n: [0, 2])
 
@@ -31,7 +31,7 @@ def test_allplayerdata_initialization_creates_players(monkeypatch):
 def test_set_scores_computes_correct_values():
     data = InputData(numPlayers=2,numMatches=3, gamesPerMatch=3, targetTop=6, pointsPerWin=3, pointsPerTie=1, pointsPerLoss=0, tiebreakers=[True,True,True], lastMatchIsDraw=True, 
         numUncomp=0,probLastGameTiesBetweenComp=.02, probLastGameTiesBetweenUncomp=.02,probLastGameTiesBetweenMismatched=.02,probGameWinBetweenMismatched=.02,
-        monteCarloChosen=False,monteCarloIterations=10)
+        minDrawProb=.9,monteCarloIterations=10)
     apd = AllPlayerData(data)
 
     # Set up matches manually
@@ -69,7 +69,7 @@ def test_set_scores_computes_correct_values():
 def test_set_scores_no_opponents_does_nothing():
     data =     data = InputData(numPlayers=1,numMatches=3, gamesPerMatch=3, targetTop=6, pointsPerWin=1, pointsPerTie=2, pointsPerLoss=4, tiebreakers=[True,True,True], lastMatchIsDraw=True, 
         numUncomp=0,probLastGameTiesBetweenComp=.02, probLastGameTiesBetweenUncomp=.02,probLastGameTiesBetweenMismatched=.02,probGameWinBetweenMismatched=.02,
-        monteCarloChosen=False,monteCarloIterations=10)
+        minDrawProb=.9,monteCarloIterations=10)
     apd = AllPlayerData(data)
     # No opponents, so Set_Scores should skip
     apd.Set_Scores()

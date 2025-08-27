@@ -36,33 +36,35 @@ class AllPlayerData:
             self.DictPlayers[i]=new_player
             self.DictPlayersScores[i]=new_scoredata
 
-    
+    def Set_Score_i(self,i:int):
+        player=self.DictPlayers[i]
+        points_i= self.GameData.pointsPerWin*player.MatchesWon+self.GameData.pointsPerLoss*player.MatchesLost+self.GameData.pointsPerTie*player.MatchesTied
+        GW_total=(player.GamesWon+player.GamesLost+player.GamesTied)
+        if GW_total == 0:
+            GW_i=0
+        else:
+            GW_i= player.GamesWon/GW_total
+        OMW_total=0
+        OM_total=0
+        OGW_total=0
+        OG_total=0
+        for i in player.OpponentsPlayed:
+            OMW_total+=self.DictPlayers[i].MatchesWon
+            OM_total+=self.DictPlayers[i].MatchesWon+ self.DictPlayers[i].MatchesLost + self.DictPlayers[i].MatchesTied
+            OGW_total+=self.DictPlayers[i].GamesWon
+            OG_total+=self.DictPlayers[i].GamesWon+ self.DictPlayers[i].GamesLost + self.DictPlayers[i].GamesTied
+        if OM_total == 0:
+            OMW_i=0
+        else:
+            OMW_i=OMW_total/OM_total
+        if OG_total==0:
+            OGW_i=0
+        else:
+            OGW_i=OGW_total/OG_total
+        Score_i = ScoreData(points=points_i,OMW=OMW_i,GW=GW_i,OGW=OGW_i)
+        player.Score=Score_i
+        self.DictPlayersScores[i]= Score_i
+
     def Set_Scores(self):
         for i in self.DictPlayers.keys():
-            player=self.DictPlayers[i]
-            points_i= self.GameData.pointsPerWin*player.MatchesWon+self.GameData.pointsPerLoss*player.MatchesLost+self.GameData.pointsPerTie*player.MatchesTied
-            GW_total=(player.GamesWon+player.GamesLost+player.GamesTied)
-            if GW_total == 0:
-                GW_i=0
-            else:
-                GW_i= player.GamesWon/GW_total
-            OMW_total=0
-            OM_total=0
-            OGW_total=0
-            OG_total=0
-            for i in player.OpponentsPlayed:
-                OMW_total+=self.DictPlayers[i].MatchesWon
-                OM_total+=self.DictPlayers[i].MatchesWon+ self.DictPlayers[i].MatchesLost + self.DictPlayers[i].MatchesTied
-                OGW_total+=self.DictPlayers[i].GamesWon
-                OG_total+=self.DictPlayers[i].GamesWon+ self.DictPlayers[i].GamesLost + self.DictPlayers[i].GamesTied
-            if OM_total == 0:
-                OMW_i=0
-            else:
-                OMW_i=OMW_total/OM_total
-            if OG_total==0:
-                OGW_i=0
-            else:
-                OGW_i=OGW_total/OG_total
-            Score_i = ScoreData(points=points_i,OMW=OMW_i,GW=GW_i,OGW=OGW_i)
-            player.Score=Score_i
-            self.DictPlayersScores[i]= Score_i
+            self.Set_Score_i(i)

@@ -25,7 +25,7 @@ class FormData(BaseModel):
     probLastGameTiesBetweenUncomp: Annotated[float,Field(ge=0, le=1, default = .1)]
     probLastGameTiesBetweenMismatched: Annotated[float,Field(ge=0, le=1, default = .1)]
     probGameWinBetweenMismatched: Annotated[float,Field(ge=0, le=1, default = .6)]
-    monteCarloChosen: bool
+    minDrawProb: Annotated[float,Field(ge=0, le=1, default = .9)]
     monteCarloIterations: Annotated[int,Field(gt=0, le=2000,default=10)]
 
 
@@ -52,7 +52,7 @@ def calculate_route(data: FormData):
         probLastGameTiesBetweenUncomp =data_dict["probLastGameTiesBetweenUncomp"],
         probLastGameTiesBetweenMismatched =data_dict["probLastGameTiesBetweenMismatched"],
         probGameWinBetweenMismatched =data_dict["probGameWinBetweenMismatched"],
-        monteCarloChosen =  data_dict["monteCarloChosen"],
+        minDrawProb =  data_dict["minDrawProb"],
         monteCarloIterations = data_dict.get("monteCarloIterations"),
     )
     

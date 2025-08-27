@@ -2,13 +2,15 @@ import math
 
 class InputData:
     def __init__(self,numPlayers,numMatches, gamesPerMatch, targetTop, pointsPerWin, pointsPerTie, pointsPerLoss, tiebreakers, lastMatchIsDraw, 
-        numUncomp,probLastGameTiesBetweenComp, probLastGameTiesBetweenUncomp,probLastGameTiesBetweenMismatched,probGameWinBetweenMismatched,
-        monteCarloChosen,monteCarloIterations):
+        numUncomp,probLastGameTiesBetweenComp, probLastGameTiesBetweenUncomp,probLastGameTiesBetweenMismatched,probGameWinBetweenMismatched,minDrawProb,monteCarloIterations):
         
-        self.monteCarloChosen=monteCarloChosen
-            #default: false
+        self.monteCarloChosen=True
+            #always true change if want direct calc to be implemented
+
         self.monteCarloIterations= monteCarloIterations if monteCarloIterations%2==1 else monteCarloIterations+1
 
+        self.minDrawProb=minDrawProb
+            #default: .9
 
         self.numPlayers = numPlayers
             #default: 16
@@ -51,11 +53,10 @@ class InputData:
         #take in random variable betweeon 0-1 output (player_one_outcomes,player_two_outcomes) 
         #always assumes player one is advantaged if mismatched
         #outcomes of form ('won'/'lost'/'tied',games_won, games_lost,games_tied,total_games)
-        if monteCarloChosen:
-            self.function_of_match_outcomes_comp= match_outcome_function(self.probGameWinBetweenMatchedDecks,self.gamesPerMatch,self.probLastGameTiesBetweenComp)
-            self.function_of_match_outcomes_uncomp = match_outcome_function(self.probGameWinBetweenMatchedDecks,self.gamesPerMatch,self.probLastGameTiesBetweenUncomp)
-            self.function_of_match_outcomes_mismatched = match_outcome_function(self.probGameWinBetweenMismatched,self.gamesPerMatch,self.probLastGameTiesBetweenMismatched)
-
+        
+        (self.funcMatchOutcomesComp,self.listCutoffsComp)= match_outcome_function(self.probGameWinBetweenMatchedDecks,self.gamesPerMatch,self.probLastGameTiesBetweenComp)
+        (self.funcMatchOutcomesUncomp,self.listCutoffsUncomp)= match_outcome_function(self.probGameWinBetweenMatchedDecks,self.gamesPerMatch,self.probLastGameTiesBetweenUncomp)
+        (self.funcMatchOutcomesMismatched,self.listCutoffsMismatched)= match_outcome_function(self.probGameWinBetweenMismatched,self.gamesPerMatch,self.probLastGameTiesBetweenMismatched)
 
 
 def event_probs(i,j,p_i,p_j):
@@ -269,9 +270,8 @@ def match_outcome_function(game_win_prob_player_one, games_per_match, ProbLastGa
             player_one_outcome=(player_one_match_outcome, games_won_by_one,games_won_by_two,games_tied, total_games)
             player_two_outcome=(player_two_match_outcome, games_won_by_two,games_won_by_one,games_tied, total_games)
             return (player_one_outcome,player_two_outcome)
-    return output_function
+    return (output_function,list_of_cutoffs)
 
-match_outcome_function(.6,11,0)
 
 """
 made redundant by using function form above

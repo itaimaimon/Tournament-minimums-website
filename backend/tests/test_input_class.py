@@ -5,7 +5,7 @@ from backend.components.input_class import InputData, event_probs, get_to_step_n
 def test_create_input_data_valid():
     data = InputData(numPlayers=8,numMatches=3, gamesPerMatch=3, targetTop=6, pointsPerWin=1, pointsPerTie=2, pointsPerLoss=4, tiebreakers=[True,True,True], lastMatchIsDraw=True, 
         numUncomp=1,probLastGameTiesBetweenComp=.02, probLastGameTiesBetweenUncomp=.02,probLastGameTiesBetweenMismatched=.02,probGameWinBetweenMismatched=.02,
-        monteCarloChosen=False,monteCarloIterations=10)
+                minDrawProb=.9,monteCarloIterations=10)
     assert data.numPlayers == 8
     assert data.numMatches == 3
     assert data.gamesPerMatch == 3
@@ -24,7 +24,7 @@ def test_create_input_data_valid():
     assert data.probLastGameTiesBetweenUncomp==.02
     assert data.probLastGameTiesBetweenMismatched==.02
     assert data.probGameWinBetweenMismatched==.02
-    assert data.monteCarloChosen==False
+    assert data.minDrawProb ==.9
     assert data.monteCarloIterations==11
     assert data.probGameWinBetweenMatchedDecks==.5
 
@@ -46,7 +46,7 @@ def make_input_data(**overrides):
         probLastGameTiesBetweenUncomp=0.1,
         probLastGameTiesBetweenMismatched=0.05,
         probGameWinBetweenMismatched=0.6,
-        monteCarloChosen=False,
+        minDrawProb=.9,
         monteCarloIterations=101
     )
     defaults.update(overrides)
@@ -88,7 +88,7 @@ def test_get_to_step_n_matches_known_value():
 # --- match_outcome_function tests ---
 
 def test_match_outcome_function_distribution_sums_to_one():
-    func = match_outcome_function(0.6, 3, 0.1)
+    func = match_outcome_function(0.6, 3, 0.1)[0]
     # Check distribution across 100 random samples
     outcomes = [func(i / 100) for i in range(1, 100)]
     # just assert that function runs and returns tuples
@@ -98,15 +98,15 @@ def test_match_outcome_function_distribution_sums_to_one():
         assert p1[0] in {"won", "lost", "tied"}
 
 def test_match_outcome_function_even_and_odd():
-    odd_func = match_outcome_function(0.6, 3, 0.1)
-    even_func = match_outcome_function(0.6, 4, 0.1)
+    odd_func = match_outcome_function(0.6, 3, 0.1)[0]
+    even_func = match_outcome_function(0.6, 4, 0.1)[0]
     out1 = odd_func(0.5)
     out2 = even_func(0.5)
     assert isinstance(out1, tuple)
     assert isinstance(out2, tuple)
 
 def test_match_outcome_function_tie_edge_case():
-    func = match_outcome_function(0.5, 3, 1.0)  # force ties
+    func = match_outcome_function(0.5, 3, 1.0)[0]  # force ties
     p1, p2 = func(0.01)
     assert p1[0] == "tied"
     assert p2[0] == "tied"

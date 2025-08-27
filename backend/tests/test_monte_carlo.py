@@ -2,6 +2,7 @@
 import pytest
 import random
 from unittest.mock import patch, MagicMock
+from backend.components.player_class import PlayerData, AllPlayerData, ScoreData
 
 # Import functions to test
 from backend.components.monte_carlo import (
@@ -30,15 +31,21 @@ class DummyPlayer:
     def get_points(self, data):
         return self.MatchesWon * 3 + self.MatchesTied
 
+
+
+
 class DummyInput:
     def __init__(self):
         self.numMatches = 2
         self.targetTop = 1
         self.tiebreakers = [True, True, True]
         self.monteCarloIterations = 2
-        self.function_of_match_outcomes_comp = lambda r: (("won", 2, 0, 0), ("lost", 0, 2, 0))
-        self.function_of_match_outcomes_mismatched = lambda r: (("won", 2, 0, 0), ("lost", 0, 2, 0))
-        self.function_of_match_outcomes_uncomp = lambda r: (("tied", 1, 1, 1), ("tied", 1, 1, 1))
+        self.funcMatchOutcomesComp = lambda r: (("won", 2, 0, 0), ("lost", 0, 2, 0))
+        self.funcMatchOutcomesMismatched = lambda r: (("won", 2, 0, 0), ("lost", 0, 2, 0))
+        self.funcMatchOutcomesUncomp = lambda r: (("tied", 1, 1, 1), ("tied", 1, 1, 1))
+        self.lastMatchIsDraw = False
+        self.minDrawProb = 0.9
+        self.gamesPerMatch = 3
 
 class DummyScore:
     def __init__(self, points=0, OMW=0, GW=0, OGW=0):
@@ -93,7 +100,7 @@ def test_ordering_respects_tiebreakers():
         DummyScore(points=3, OMW=2, GW=2, OGW=1),
     ]
     result = order(scores, [True, True, True])
-    assert result[0].OMW <= result[1].OMW
+    assert result[0].OMW > result[1].OMW
 
 
 def test_process_returns_expected_tuple():
