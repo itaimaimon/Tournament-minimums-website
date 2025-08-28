@@ -416,7 +416,7 @@ export default function Home() {
       </div>
 
       <footer className="mt-12 text-gray-500 text-sm">
-        &copy; 2025 MTG Calculator
+        &copy; 2025 Itai Maimon
       </footer>
     </div>
   );
