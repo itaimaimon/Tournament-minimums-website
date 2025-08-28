@@ -26,5 +26,5 @@ body {
 }
 
 input, select, textarea {
-  @apply text-black;
+  @apply  text-gray-800;
 }

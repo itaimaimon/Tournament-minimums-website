@@ -228,7 +228,7 @@ export default function Home() {
                           setFormData({ ...formData, tiebreakers: newTiebreakers });
                         }}
                       />
-                      <span>{label}</span>
+                       <span className="text-gray-800">{label}</span> 
                     </label>
                   )
                 )}
