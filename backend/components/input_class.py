@@ -58,6 +58,22 @@ class InputData:
         (self.funcMatchOutcomesUncomp,self.listCutoffsUncomp)= match_outcome_function(self.probGameWinBetweenMatchedDecks,self.gamesPerMatch,self.probLastGameTiesBetweenUncomp)
         (self.funcMatchOutcomesMismatched,self.listCutoffsMismatched)= match_outcome_function(self.probGameWinBetweenMismatched,self.gamesPerMatch,self.probLastGameTiesBetweenMismatched)
 
+        if not self.monteCarloChosen:
+            self.probability_of_match_ties_between_comp_decks=self.listCutoffsComp[1]
+            self.probability_of_match_ties_between_uncomp_decks=self.listCutoffsUncomp[1]
+            self.probability_of_match_ties_between_mismatched_decks=self.listCutoffsMismatched[1]
+
+            if(self.gamesPerMatch%2==1):
+                if self.gamesPerMatch==1:
+                    self.probability_of_match_win_between_mismatched_decks=self.listCutoffsMismatched[2]-self.listCutoffsMismatched[1]
+                else:
+                    self.probability_of_match_win_between_mismatched_decks=self.listCutoffsMismatched[math.floor(self.gamesPerMatch/2)+3]-self.listCutoffsMismatched[3]+self.listCutoffsMismatched[2]-self.listCutoffsMismatched[1]
+            else:
+                if self.gamesPerMatch==2:
+                    self.probability_of_match_win_between_mismatched_decks=self.listCutoffsMismatched[4]-self.listCutoffsMismatched[3]+self.listCutoffsMismatched[2]-self.listCutoffsMismatched[1]
+                else: 
+                    self.probability_of_match_win_between_mismatched_decks=self.listCutoffsMismatched[math.floor(self.gamesPerMatch/2)+3]-self.listCutoffsMismatched[5]+self.listCutoffsMismatched[4]+ self.listCutoffsMismatched[3]+self.listCutoffsMismatched[2]-self.listCutoffsMismatched[1]
+
 
 def event_probs(i,j,p_i,p_j):
     if not i==j:

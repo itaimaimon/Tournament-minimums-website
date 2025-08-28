@@ -32,7 +32,7 @@ export default function Home() {
     pointsPerTie: 1, //1,
     pointsPerLoss: 0, //0,
     tiebreakers: [true,true,true], // ['omw','gw','ogw'],
-    lastMatchIsDraw: true, //true,
+    lastMatchIsDraw: false, //true,
     numUncomp: 0, //0,
     probLastGameTiesBetweenComp: .1, //.1,
     probLastGameTiesBetweenUncomp: .1, //.1,
@@ -172,7 +172,7 @@ export default function Home() {
                 
                 
                   <div className="col-span-2 p-3 bg-white rounded-lg shadow-sm">
-                  <label className="block font-medium text-gray-700 mb-1">Point Allocation</label>
+                  <label className="block font-medium text-gray-700 mb-1">Point Allocation:</label>
 
                   <div className="grid grid-cols-3 gap-3">
                     <div>
@@ -215,7 +215,7 @@ export default function Home() {
               </div>
                 
               <div className="p-3 bg-white rounded-lg shadow-sm">
-                <label className="block font-medium text-gray-700 mb-1">Tiebreakers</label>
+                <label className="block font-medium text-gray-700 mb-1">Tiebreakers:</label>
                 {["Opponent Match Win%", "Game Win%", "Opponent Game Win%"].map(
                   (label, index) => (
                     <label key={index} className="flex items-center space-x-2">
@@ -267,7 +267,7 @@ export default function Home() {
             <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-4">
             
             <div className="p-3 bg-white rounded-lg shadow-sm">
-                  <label className="block font-medium text-gray-700 mb-1"> Number of Uncompetitive decks in Tournament</label>
+                  <label className="block font-medium text-gray-700 mb-1"> Number of Uncompetitive Decks in Tournament</label>
                   <input
                     type="number"
                     value={formData.numUncomp ?? ""}
@@ -290,7 +290,7 @@ export default function Home() {
 
 
             <div className=" col-span-2 p-3 bg-white rounded-lg shadow-sm">
-                  <label className="block font-medium text-gray-700 mb-1">Probability of Last Game Timing out to a Draw</label>
+                  <label className="block font-medium text-gray-700 mb-1">Probability of Last Game Timing out to a Draw:</label>
 
                   <div className="grid grid-cols-3 gap-3">
                     <div>
@@ -333,7 +333,7 @@ export default function Home() {
               </div>
 
               <div className="p-3 bg-white rounded-lg shadow-sm">
-                <label className="block font-medium text-gray-700 mb-1">Is the last match Normal?(only works if monte-carlo is not chosen)</label>
+                <label className="block font-medium text-gray-700 mb-1">Is the Last Match Normal?(calculating draws slows down the result a bunch)</label>
                   <select
                     id="allowLastRoundDraw"
                     value={formData.lastMatchIsDraw ? "Draws" : "Normal"}
@@ -345,13 +345,14 @@ export default function Home() {
                     }
                     className="w-full rounded-lg border p-2"
                   >
-                    <option value="Draws"> Players draw to both make the top N</option>
-                    <option value="Normal"> Players play normally</option>
+                    <option value="Normal"> Players Play Normally</option>
+                    <option value="Draws"> Players Draw if Both Make The Top N</option>
+
                   </select>
               </div>   
 
             <div className="p-3 bg-white rounded-lg shadow-sm">
-              <label className="block font-medium text-gray-700 mb-1"> Minimum Probability needed for both players to draw last Match</label>
+              <label className="block font-medium text-gray-700 mb-1"> Minimum Probability of Success for Both Players to Draw Last Match</label>
                 <input
                   type="number"
                   value={formData.minDrawProb ?? ""}

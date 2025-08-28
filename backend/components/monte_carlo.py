@@ -28,11 +28,14 @@ def simulate_tourney(data: InputData):
             for j in pairs:
                 simulate_match(j,AllPlayerData_1.DictPlayers,data)
         else:
-            drawers= determine_draw(pairs,AllPlayerData_1,data)
-            for j in pairs:
-                if j in drawers:
-                    player_1=AllPlayerData_1.DictPlayers[j[0]]
-                    player_2=AllPlayerData_1.DictPlayers[j[1]]
+            for keyj in range(min(len(pairs),data.targetTop),len(pairs)) :
+                simulate_match(pairs[keyj],AllPlayerData_1.DictPlayers,data)
+            drawers=determine_draw(pairs,AllPlayerData_1,data)
+            for keyj in range(min(len(pairs),data.targetTop)):
+                if keyj in drawers:
+                    pair=pairs[keyj]
+                    player_1=AllPlayerData_1.DictPlayers[pair[0]]
+                    player_2=AllPlayerData_1.DictPlayers[pair[1]]
 
                     player_1.MatchesTied+=1
                     player_2.MatchesTied+=1
@@ -46,21 +49,21 @@ def simulate_tourney(data: InputData):
     return AllPlayerData_1.DictPlayersScores
 
 def determine_draw(pairs,AllPlayerData_1: AllPlayerData, data:InputData):
-    minDrawProp = data.minDrawProb*50
+    num_iterations=25
+    potential_drawers=min(data.targetTop,len(pairs))
+    minDrawProp = data.minDrawProb*num_iterations
     if minDrawProp-math.floor(minDrawProp)>.5:
         minDrawProp=math.ceil(minDrawProp)
     else:
         minDrawProp=math.floor(minDrawProp)
-
-    num_losses_1=[50-minDrawProp]*len(pairs)
-    num_losses_2=[50-minDrawProp]*len(pairs)
-    for i in range(50):
+    num_losses_1=[num_iterations-minDrawProp]*potential_drawers
+    num_losses_2=[num_iterations-minDrawProp]*potential_drawers
+    for i in range(num_iterations):
         AllPlayerData_i=copy.deepcopy(AllPlayerData_1)
-        for i in pairs:
-            simulate_match(i,AllPlayerData_i.DictPlayers,data)
-        
+        for keyj in range(potential_drawers):
+            simulate_match(pairs[keyj],AllPlayerData_i.DictPlayers,data)
         AllPlayerData_i.Set_Scores()    
-        for keyj in range(len(pairs)):
+        for keyj in range(potential_drawers):
             j=pairs[keyj]
             player_1_new=AllPlayerData_i.DictPlayers[j[0]]
             player_2_new=AllPlayerData_i.DictPlayers[j[1]]
@@ -90,9 +93,9 @@ def determine_draw(pairs,AllPlayerData_1: AllPlayerData, data:InputData):
             AllPlayerData_i.DictPlayers[j[1]]=player_2_new
 
     drawers=[]
-    for j in range(len(pairs)):
+    for j in range(potential_drawers):
         if num_losses_1[j]>0 and num_losses_2[j]>0:
-            drawers.append(pairs[j])
+            drawers.append(j)
 
     return drawers
 
