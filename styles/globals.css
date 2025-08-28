@@ -26,5 +26,5 @@ body {
 }
 
 input, select, textarea {
-  @apply text-black placeholder:text-black placeholder:opacity-100;
+  @apply text-black;
 }
