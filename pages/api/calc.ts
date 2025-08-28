@@ -17,7 +17,7 @@ export default async function handler(
 
   try {
     // Forward the request body to the local Python FastAPI
-    const pythonResponse = await fetch("http://127.0.0.1:8000/calculate", {
+    const pythonResponse = await fetch("https://tournament-minimums-website.onrender.com/calculate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,8 +34,10 @@ export default async function handler(
 
     // Return the Python API result
     return res.status(200).json({ result: data.result });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error) {
     console.error("Error in /api/calc:", error.message);
+    }
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
